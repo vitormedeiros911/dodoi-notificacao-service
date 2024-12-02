@@ -12,42 +12,36 @@ export class PushNotificationService {
   private readonly apiUrl = process.env.PUSH_NOTIFICATION_API_URL;
 
   async sendNotification(data: NotificacaoDto) {
-    try {
-      await firstValueFrom(
-        this.httpService
-          .post(
-            this.apiUrl,
-            {
-              app_id: this.appId,
-              headings: { en: data.titulo, pt: data.titulo },
-              contents: { en: data.mensagem, pt: data.mensagem },
-              target_channel: 'push',
-              filters: [
-                {
-                  field: 'tag',
-                  key: data.tagKey,
-                  relation: '=',
-                  value: data.tagValue,
-                },
-              ],
-            },
-            {
-              headers: {
-                Authorization: `Key ${this.apiKey}`,
-                'Content-Type': 'application/json',
+    await firstValueFrom(
+      this.httpService
+        .post(
+          this.apiUrl,
+          {
+            app_id: this.appId,
+            headings: { en: data.titulo, pt: data.titulo },
+            contents: { en: data.mensagem, pt: data.mensagem },
+            target_channel: 'push',
+            filters: [
+              {
+                field: 'tag',
+                key: data.tagKey,
+                relation: '=',
+                value: data.tagValue,
               },
+            ],
+          },
+          {
+            headers: {
+              Authorization: `Key ${this.apiKey}`,
+              'Content-Type': 'application/json',
             },
-          )
-          .pipe(
-            catchError((error) => {
-              console.log('error', error);
-              return error;
-            }),
-          ),
-      );
-    } catch (error) {
-      console.log('error', error);
-      throw error;
-    }
+          },
+        )
+        .pipe(
+          catchError((error) => {
+            throw error;
+          }),
+        ),
+    );
   }
 }
